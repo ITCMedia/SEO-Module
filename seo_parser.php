@@ -1,5 +1,7 @@
 <? 
-
+// Версия 1.2.4
+// 23.11.2015
+// Обновление главной страницы, корневых директорий, информационных систем, магазина
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 require_once ('js/seo_update/excel.php'); // Модуль разбора Exell
@@ -7,7 +9,7 @@ require_once ('js/seo_update/class.php'); // Модуль обновления
 Error_Reporting(E_ALL & ~E_NOTICE);
 $Excel = new Spreadsheet_Excel_Reader(); // создаем объект
 $Excel->setOutputEncoding('cp1251'); // устанавливаем кодировку
-$Excel->read('js/seo_update/novij-dom.xls'); // открываем файл
+$Excel->read('js/seo_update/meta.xls'); // открываем файл
 $count = $Excel->sheets[0]['numRows']; // узнаем количество строк в 1 листе
 
 $updater = new Updater;
@@ -45,8 +47,8 @@ for ($rowNum = 1; $rowNum <= $count; $rowNum++) {
 	$url_level_2 = '';
 	
 	// Получаем ID структуры
-	if(isset($CurrentUrl[2])){
-		if($CurrentUrl[2] != ''){
+	if(isset($CurrentUrl[1])){
+		if($CurrentUrl[1] != ''){
 			$url_level_1 = $CurrentUrl[1];
 			$current_structure = $updater->getStructure($url_level_1);
 		}
@@ -69,13 +71,15 @@ for ($rowNum = 1; $rowNum <= $count; $rowNum++) {
 			if($levelsNum <= 2 && $levelsNum == $countLevels-2){
 				//echo "<br>Итерация больше 2, а точнее: " .$levelsNum ." Название: " .$CurrentUrl[$levelsNum];
 				$deepLevel = $CurrentUrl[$levelsNum];
-				// Если переменная с ID ИС не пуста - обновляем ИС
 				if ($informationsystem_id != ''){
+					// Если переменная с ID ИС не пуста - обновляем ИС
 					$updater->isUpdate($deepLevel, $informationsystem_id, $title, $description, $keywords);
-				}
-				// Если переменная с ID ИМ не пуста - обновляем ИМ
-				if($shop_id != ''){
+				}elseif($shop_id != ''){
+					// Если переменная с ID ИМ не пуста - обновляем ИМ
 					$updater->shopUpdate($deepLevel, $shop_id, $title, $description, $keywords);
+				}else{
+					// Обновляем вложенную структуру. 
+					$updater->updateStructure($deepLevel, $title, $description, $keywords);
 				}
 			}
 		}		
@@ -92,13 +96,15 @@ for ($rowNum = 1; $rowNum <= $count; $rowNum++) {
 			if($levelsNum > 2 && $levelsNum == $countLevels-2){ // -2 изза того, что присутствует доменный уровень + последний слэш
 				//echo "<br>Итерация больше 2, а точнее: " .$levelsNum ." Название: " .$CurrentUrl[$levelsNum];
 				$deepLevel = $CurrentUrl[$levelsNum];
-				// Если переменная с ID ИС не пуста - обновляем ИС
 				if ($informationsystem_id != ''){
+					// Если переменная с ID ИС не пуста - обновляем ИС
 					$updater->isUpdate($deepLevel, $informationsystem_id, $title, $description, $keywords);
-				}
-				// Если переменная с ID ИМ не пуста - обновляем ИМ
-				if($shop_id != ''){
+				}elseif($shop_id != ''){
+					// Если переменная с ID ИМ не пуста - обновляем ИМ
 					$updater->shopUpdate($deepLevel, $shop_id, $title, $description, $keywords);
+				}else{
+					// Обновляем вложенную структуру. 
+					$updater->updateStructure($deepLevel, $title, $description, $keywords);
 				}
 			}
 		}		

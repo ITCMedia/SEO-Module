@@ -45,14 +45,18 @@ for ($rowNum = 1; $rowNum <= $count; $rowNum++) {
 	$url_level_2 = '';
 	
 	// Получаем ID структуры
-	if($CurrentUrl[1] != ''){
-		$url_level_1 = $CurrentUrl[1];
-		$current_structure = $updater->getStructure($url_level_1);
+	if(isset($CurrentUrl[2])){
+		if($CurrentUrl[2] != ''){
+			$url_level_1 = $CurrentUrl[1];
+			$current_structure = $updater->getStructure($url_level_1);
+		}
 	}
 	
 	// Проверяем, есть ли еще уровни URL и система они или нет. Если нет - обновляем корневой уровень
 	$countLevels = count($CurrentUrl, 1);
-	if($CurrentUrl[2] != '' && $countLevels <= 4){
+	if($CurrentUrl[1] == '' && $countLevels == 2){
+		$updater->updateMainpage($title, $description, $keywords);
+	}elseif($CurrentUrl[2] != '' && $countLevels <= 4){
 		// Получаем массив в виде ID ИС или ИМ и разбиваем их на переменные
 		$getID = $updater->checkSystem($current_structure);
 		if($getID['is_id'] != ''){

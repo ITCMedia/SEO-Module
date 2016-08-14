@@ -34,45 +34,7 @@ class Updater{
 		return $systemReturn;
 	}
 	
-	public function isUpdate($url_level_2, $informationsystem_id, $title, $description, $keywords){
-		$query_item = mysql_query("SELECT `informationsystem_group_id` FROM `informationsystem_items` WHERE `path` ='{$url_level_2}' AND `informationsystem_id` ='{$informationsystem_id}'");
-		$output = mysql_fetch_array($query_item); // Преобразование выборки в ассоциативный массив для дальнейшего взятия ячейки.
-		$informationsystem_group_id = $output['informationsystem_group_id'];
-		if($informationsystem_group_id != ''){
-			$result = mysql_query ("UPDATE `informationsystem_items` SET `seo_title`='{$title}', `seo_description`='{$description}', `seo_keywords`='{$keywords}'  WHERE `path` ='{$url_level_2}' AND `informationsystem_id` ='{$informationsystem_id}'");
-			if ($result == 'true')
-			{
-				//echo "<br>Данные для инфоэлемента " . $url_level_2 . " успешно обновлены.";
-			}
-		}else{
-			$result = mysql_query ("UPDATE `informationsystem_groups` SET `seo_title`='{$title}', `seo_description`='{$description}', `seo_keywords`='{$keywords}'  WHERE `path` ='{$url_level_2}' AND `informationsystem_id` ='{$informationsystem_id}'");
-			if ($result == 'true')
-			{
-				//echo "<br>Данные для группы " . $url_level_2 . " обновлены.";
-			}
-		}
-	}
-	
-	public function shopUpdate($url_level_2, $shop_id, $title, $description, $keywords){
-		$query_item = mysql_query("SELECT `shop_group_id` FROM `shop_items` WHERE `path` ='{$url_level_2}' AND `shop_id` ='{$shop_id}'");
-		$output = mysql_fetch_array($query_item); 
-		$shop_group_id = $output['shop_group_id'];
-		if($shop_group_id != ''){
-			$result = mysql_query ("UPDATE `shop_items` SET `seo_title`='{$title}', `seo_description`='{$description}', `seo_keywords`='{$keywords}'  WHERE `path` ='{$url_level_2}' AND `shop_id` ='{$shop_id}'");
-			if ($result == 'true')
-			{
-				//echo "<br>Данные для товара " . $url_level_2 . " успешно обновлены.";
-			}
-		}else{
-			$result = mysql_query ("UPDATE `shop_groups` SET `seo_title`='{$title}', `seo_description`='{$description}', `seo_keywords`='{$keywords}'  WHERE `path` ='{$url_level_2}' AND `shop_id` ='{$shop_id}'");
-			if ($result == 'true')
-			{
-				//echo "<br>Данные для группы магазина " . $url_level_2 . " обновлены.";
-			}
-		}
-	}
-	
-	public function shopDeepUpdate($deepLevel, $shop_id, $title, $description, $keywords){
+	public function shopUpdate($deepLevel, $shop_id, $title, $description, $keywords){
 		$query_item = mysql_query("SELECT `shop_group_id` FROM `shop_items` WHERE `path` ='{$deepLevel}' AND `shop_id` ='{$shop_id}'");
 		$output = mysql_fetch_array($query_item); 
 		$shop_group_id = $output['shop_group_id'];
@@ -91,7 +53,7 @@ class Updater{
 		}
 	}
 	
-	public function isDeepUpdate($deepLevel, $informationsystem_id, $title, $description, $keywords){
+	public function isUpdate($deepLevel, $informationsystem_id, $title, $description, $keywords){
 		$query_item = mysql_query("SELECT `informationsystem_group_id` FROM `informationsystem_items` WHERE `path` ='{$deepLevel}' AND `informationsystem_id` ='{$informationsystem_id}'");
 		$output = mysql_fetch_array($query_item); // Преобразование выборки в ассоциативный массив для дальнейшего взятия ячейки.
 		$informationsystem_group_id = $output['informationsystem_group_id'];

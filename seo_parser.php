@@ -7,7 +7,7 @@ require_once ('js/seo_update/class.php'); // Модуль обновления
 Error_Reporting(E_ALL & ~E_NOTICE);
 $Excel = new Spreadsheet_Excel_Reader(); // создаем объект
 $Excel->setOutputEncoding('cp1251'); // устанавливаем кодировку
-$Excel->read('js/seo_update/test_seo.xls'); // открываем файл
+$Excel->read('js/seo_update/novij-dom.xls'); // открываем файл
 $count = $Excel->sheets[0]['numRows']; // узнаем количество строк в 1 листе
 
 $updater = new Updater;
@@ -25,7 +25,9 @@ for ($rowNum = 1; $rowNum <= $count; $rowNum++) {
 		$title = '';
 	}
 	if(isset($Excel->sheets[0]['cells'][$rowNum][4])){
-		$description = strip_tags(mb_convert_encoding($Excel->sheets[0]['cells'][$rowNum][4], "UTF-8", "cp1251")); // DESCRIPTION
+		$description = $Excel->sheets[0]['cells'][$rowNum][4]; // DESCRIPTION
+		$description = strip_tags(mb_convert_encoding($Excel->sheets[0]['cells'][$rowNum][4], "UTF-8", "cp1251"));// TITLE
+		$description = str_replace("&#9742;","☎",$description);
 	}else{
 		$description = '';
 	}

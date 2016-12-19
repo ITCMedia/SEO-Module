@@ -1,7 +1,7 @@
 <?php
-// Версия 1.3
-// 16.12.2016
-// Добавлено получение ID родительской группы
+// Версия 1.3.1
+// 19.12.2016
+// Улучшено получение родительской группы
 class Updater{
 	public $informationsystem_id, $shop_id, $structure_id;
 	
@@ -43,18 +43,32 @@ class Updater{
 		return $systemReturn;
 	}
 	
+	public function getParent($tableUpdate, $prevLvl, $systemTypeID, $systemID){
+		$query_item = mysql_query("SELECT `id` FROM `{$tableUpdate}` WHERE `path` ='{$prevLvl}' AND `{$systemTypeID}` ='{$systemID}' AND `deleted` ='0'"); // Параметрами подставляем данные для ИМ или ИС.
+		$output = mysql_fetch_array($query_item); // Преобразование выборки в ассоциативный массив для дальнейшего взятия ячейки.
+		if($output['id'] != '')
+			$parent_group_id = $output['id'];
+		else 
+			$parent_group_id = 0;
+		
+		return $parent_group_id;
+		// Если и после данного решения будут коллизии, то в этой функции нужно будет сделать рекурсивный вызов, чтобы узнать родителя родительской группы. 
+	}
+	
 	public function shopUpdate($deepLevel, $prevLvl, $shop_id, $title, $description, $keywords){
+		$tableUpdate = 'shop_groups';
+		$systemTypeID = 'shop_id';
+		$systemID = $shop_id;
+		$parent_group_id = $this->getParent($tableUpdate, $prevLvl, $systemTypeID, $systemID); // Получаем родительскую группу
+		
 		$query_item = mysql_query("SELECT `shop_group_id` FROM `shop_items` WHERE `path` ='{$deepLevel}' AND `shop_id` ='{$shop_id}' AND `deleted` ='0'");
 		$output = mysql_fetch_array($query_item); 
 		$shop_group_id = $output['shop_group_id'];
 		
 		if($shop_group_id != ''){
 			$result = mysql_query ("UPDATE `shop_items` SET `seo_title`='{$title}', `seo_description`='{$description}', `seo_keywords`='{$keywords}'  WHERE `path` ='{$deepLevel}' AND `shop_id` ='{$shop_id}' AND `deleted` ='0'");
-			//if ($result == 'true') echo "<br>Данные для товара $deepLevel успешно обновлены."; 
+			//if ($result == 'true') echo "<br>Данные для товара магазина (ID родительской группы: $parent_group_id, Путь: $deepLevel) успешно обновлены."; 
 		}else{
-			$query_item = mysql_query("SELECT `id` FROM `shop_groups` WHERE `path` ='{$prevLvl}' AND `shop_id` ='{$shop_id}' AND `deleted` ='0'");
-			$output = mysql_fetch_array($query_item); // Преобразование выборки в ассоциативный массив для дальнейшего взятия ячейки.
-			$parent_group_id = $output['id'];
 
 			$result = mysql_query ("UPDATE `shop_groups` SET `seo_title`='{$title}', `seo_description`='{$description}', `seo_keywords`='{$keywords}'  WHERE `parent_id` = '{$parent_group_id}' AND `path` ='{$deepLevel}' AND `shop_id` ='{$shop_id}' AND `deleted` ='0'");
 			//if ($result == 'true') echo "<br> Данные для группы магазина (ID родительской группы: $parent_group_id, Путь: $deepLevel) обновлены. <br>";
@@ -62,18 +76,20 @@ class Updater{
 	}
 	
 	public function isUpdate($deepLevel, $prevLvl, $informationsystem_id, $title, $description, $keywords){
+		$tableUpdate = 'informationsystem_groups';
+		$systemTypeID = 'informationsystem_id';
+		$systemID = $informationsystem_id;
+		$parent_group_id = $this->getParent($tableUpdate, $prevLvl, $systemTypeID, $systemID); // Получаем родительскую группу
+		
 		$query_item = mysql_query("SELECT `informationsystem_group_id` FROM `informationsystem_items` WHERE `path` ='{$deepLevel}' AND `informationsystem_id` ='{$informationsystem_id}' AND `deleted` ='0'");
 		$output = mysql_fetch_array($query_item); // Преобразование выборки в ассоциативный массив для дальнейшего взятия ячейки.
 		$informationsystem_group_id = $output['informationsystem_group_id'];
 
 		if($informationsystem_group_id != ''){
-			$result = mysql_query ("UPDATE `informationsystem_items` SET `seo_title`='{$title}', `seo_description`='{$description}', `seo_keywords`='{$keywords}'  WHERE `path` ='{$deepLevel}' AND `informationsystem_id` ='{$informationsystem_id}' AND `deleted` ='0'");
-			//if ($result == 'true') echo "<br>Данные для инфоэлемента $deepLevel успешно обновлены. <br>";
+			$result = mysql_query ("UPDATE `informationsystem_items` SET `seo_title`='{$title}', `seo_description`='{$description}', `seo_keywords`='{$keywords}'  WHERE `path` ='{$deepLevel}' AND `informationsystem_id` ='{$informationsystem_id}' AND `informationsystem_group_id` = '{$parent_group_id}' AND `deleted` ='0'");
+			//if ($result == 'true') echo "<br>Данные для элемента ИС (ID родительской группы: $parent_group_id, Путь: $deepLevel) успешно обновлены. <br>";
+		
 		}else{
-			$query_item = mysql_query("SELECT `id` FROM `informationsystem_groups` WHERE `path` ='{$prevLvl}' AND `informationsystem_id` ='{$informationsystem_id}' AND `deleted` ='0'");
-			$output = mysql_fetch_array($query_item); // Преобразование выборки в ассоциативный массив для дальнейшего взятия ячейки.
-			$parent_group_id = $output['id'];
-
 			$result = mysql_query ("UPDATE `informationsystem_groups` SET `seo_title`='{$title}', `seo_description`='{$description}', `seo_keywords`='{$keywords}'  WHERE `parent_id` = '{$parent_group_id}' AND `path` ='{$deepLevel}' AND `informationsystem_id` ='{$informationsystem_id}' AND `deleted` ='0'");
 			//if ($result == 'true')  echo "<br> Данные для группы ИС (ID родительской группы: $parent_group_id, Путь: $deepLevel) обновлены. <br>";
 		}

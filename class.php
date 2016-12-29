@@ -1,7 +1,7 @@
 <?php
-// Версия 1.3.1
-// 19.12.2016
-// Улучшено получение родительской группы
+// Версия 1.3.2
+// 29.12.2016
+// Еще раз улучшено получение родительской группы
 class Updater{
 	public $informationsystem_id, $shop_id, $structure_id;
 	
@@ -13,9 +13,14 @@ class Updater{
 		return $structure_id;
 	}
 	
-	public function updateStructure($deepLevel, $title, $description, $keywords){
-		$result = mysql_query ("UPDATE `structures` SET `seo_title`='{$title}', `seo_description`='{$description}', `seo_keywords`='{$keywords}'  WHERE `path` ='{$deepLevel}' AND `deleted` ='0'");
-		//if ($result == 'true') echo "<br>Данные для корневого узла $deepLevel успешно обновлены.";
+	public function updateStructure($deepLevel, $prevLvl, $title, $description, $keywords){
+		$query_selection = mysql_query("SELECT `parent_id` FROM `structures` WHERE `path` ='{$deepLevel}' AND `deleted` ='0'");
+		$result = mysql_fetch_array($query_selection);
+		$parent_id = $this->getStructure($prevLvl);
+		if($result['parent_id'] == $parent_id)
+			$result = mysql_query ("UPDATE `structures` SET `seo_title`='{$title}', `seo_description`='{$description}', `seo_keywords`='{$keywords}'  WHERE `path` ='{$deepLevel}' AND `parent_id` = '{$parent_id}' AND `deleted` ='0'");
+		
+		//if ($result == 'true') echo "<br>Данные для корневого узла с путем $deepLevel успешно обновлены.";
 	}
 	
 	public function updateFirstLevel($url_level_1, $title, $description, $keywords){

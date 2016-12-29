@@ -1,7 +1,7 @@
-<? 
-// Версия 1.3.1
-// 19.12.2016
-// Улучшено получение родительской группы
+<?php
+// Версия 1.3.2
+// 29.12.2016
+// Еще раз улучшено получение родительской группы
 defined('HOSTCMS') || exit('HostCMS: access denied.');
 
 require_once ('js/seo_update/excel.php'); // Модуль разбора Exell
@@ -81,7 +81,7 @@ for ($rowNum = 1; $rowNum <= $count; $rowNum++) {
 					$updater->shopUpdate($deepLevel, $prevLvl, $shop_id, $title, $description, $keywords);
 				}else{
 					// Обновляем вложенную структуру. 
-					$updater->updateStructure($deepLevel, $title, $description, $keywords);
+					$updater->updateStructure($deepLevel, $prevLvl, $title, $description, $keywords);
 				}
 			}
 		}		
@@ -107,7 +107,7 @@ for ($rowNum = 1; $rowNum <= $count; $rowNum++) {
 					$updater->shopUpdate($deepLevel, $prevLvl, $shop_id, $title, $description, $keywords);
 				}else{
 					// Обновляем вложенную структуру. 
-					$updater->updateStructure($deepLevel, $title, $description, $keywords);
+					$updater->updateStructure($deepLevel, $prevLvl, $title, $description, $keywords);
 				}
 			}
 		}		
